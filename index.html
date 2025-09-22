@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ramo para Domecia</title>
+  <style>
+    /* Reset */
+    .audio-control {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #ffd24d;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .audio-control svg {
+      width: 24px;
+      height: 24px;
+      fill: #333;
+    }
+    .audio-control.playing .play-icon { display: none; }
+    .audio-control.paused .pause-icon { display: none; }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:linear-gradient(180deg,#fffaf0 0%,#fff6d6 60%,#f6f3ff 100%);font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;color:#333}
+
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:32px}
+    .card{background:rgba(255,255,255,0.7);backdrop-filter: blur(4px);border-radius:22px;padding:28px;box-shadow:0 10px 30px rgba(30,30,60,0.08);max-width:920px;width:100%;display:grid;grid-template-columns:1fr 420px;gap:24px;align-items:center}
+
+    .text{padding:12px}
+    h1{font-size:28px;margin-bottom:8px}
+    p.lead{font-size:16px;line-height:1.45;margin-bottom:14px}
+    .from{font-weight:700;color:#6b4b00}
+
+    /* Bouquet area */
+    .bouquet{display:flex;align-items:center;justify-content:center}
+    svg{width:380px;height:auto;display:block}
+
+    /* stems sway */
+    .stem{transform-origin:50% 0%;animation:sway 3.6s ease-in-out infinite}
+    .stem.delay{animation-delay:-1.2s}
+
+    @keyframes sway{
+      0%{transform:rotate(0deg)}
+      25%{transform:rotate(3deg)}
+      50%{transform:rotate(0deg)}
+      75%{transform:rotate(-3deg)}
+      100%{transform:rotate(0deg)}
+    }
+
+    /* flower bloom animation */
+    .petal{transform-origin:50% 60%;animation:bloom 1.2s ease-out both}
+    .petal.delay{animation-delay:.15s}
+    @keyframes bloom{
+      from{transform:scale(0.18) translateY(8px);opacity:0}
+      to{transform:scale(1) translateY(0);opacity:1}
+    }
+
+    /* center pulse */
+    .center{animation:beat 1.6s ease-in-out infinite}
+    @keyframes beat{
+      0%{transform:scale(1)}
+      50%{transform:scale(1.07)}
+      100%{transform:scale(1)}
+    }
+
+    /* floating confetti dots */
+    .dot{opacity:0.9;animation:floatUp 6s linear infinite}
+    .dot.d2{animation-delay:1s}
+    .dot.d3{animation-delay:2.2s}
+    .dot.d4{animation-delay:3.4s}
+    @keyframes floatUp{
+      0%{transform:translateY(20px) scale(0.9);opacity:0}
+      10%{opacity:1}
+      50%{transform:translateY(-40px) scale(1)}
+      100%{transform:translateY(-120px) scale(0.9);opacity:0}
+    }
+
+    /* ribbon animation */
+    .ribbon{transform-origin:50% 0% ;animation:wave 4s ease-in-out infinite}
+    @keyframes wave{
+      0%{transform:rotate(0deg)}
+      25%{transform:rotate(-6deg)}
+      50%{transform:rotate(0deg)}
+      75%{transform:rotate(6deg)}
+      100%{transform:rotate(0deg)}
+    }
+
+    /* small responsive tweaks */
+    @media (max-width:880px){.card{grid-template-columns:1fr;gap:18px;padding:18px}svg{width:320px} }
+    @media (max-width:420px){svg{width:260px}}
+
+    .controls{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+    button{border:0;background:#ffd24d;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:0 6px 12px rgba(0,0,0,0.06)}
+    button.ghost{background:transparent;border:2px solid rgba(107,75,0,0.08)}
+    .hidden { display: none; }
+
+  </style>
+</head>
+<body>
+  <audio id="backgroundMusic" src="flores.m4a" loop></audio>
+  <button id="audioControl" class="audio-control">
+    <svg class="play-icon" viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z"/>
+    </svg>
+    <svg class="pause-icon" viewBox="0 0 24 24">
+      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+    </svg>
+  </button>
+  <div class="wrap">
+    <div class="card" role="main">
+      <div class="text">
+        <h1>Un pequeño ramo para <span style="color:#b37800">Domenica💗</span></h1>
+        <p class="lead">Te envío este ramo amarillo con cariño. Puedes guardar la página — está hecha especialmente para ti y solo para ti.</p>
+        <p class="from">Con cariño, <span id="ownerName">Sebastian</span></p>
+
+        <div class="controls">
+
+          <button id="download">Descargar HTML</button>
+          <button class="ghost" id="surprise">Mostrar mensaje sorpresa</button>
+        </div>
+
+        <p id="surpriseText" class="hidden">¡Que tu día sea tan brillante como estas flores! 🌼</p>
+      </div>
+
+      <div class="bouquet" aria-hidden="true">
+        <!-- SVG ramo de flores amarillas -->
+        <svg viewBox="0 0 360 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ramo de flores amarillas">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#fff8c7"/>
+              <stop offset="100%" stop-color="#ffd24d"/>
+            </linearGradient>
+            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.12"/>
+            </filter>
+          </defs>
+
+          <!-- floating dots -->
+          <circle class="dot d1" cx="42" cy="80" r="3.5" fill="#ffe99a"/>
+          <circle class="dot d2" cx="318" cy="110" r="4" fill="#fff2bf"/>
+          <circle class="dot d3" cx="260" cy="38" r="2.8" fill="#ffd24d"/>
+          <circle class="dot d4" cx="120" cy="30" r="3" fill="#fff2bf"/>
+
+          <!-- stems group -->
+          <g transform="translate(120,200)">
+            <g class="stem delay">
+              <path d="M0 0 C -6 40 -10 140 12 200" stroke="#2f7a3a" stroke-width="6" fill="none" stroke-linecap="round"/>
+            </g>
+            <g class="stem" style="transform-origin:55px 0;">
+              <path d="M40 0 C 48 48 64 142 58 206" stroke="#2f7a3a" stroke-width="6" fill="none" stroke-linecap="round"/>
+            </g>
+            <g class="stem" style="transform-origin:100px 0;">
+              <path d="M80 0 C 90 38 120 110 118 198" stroke="#2f7a3a" stroke-width="6" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+
+          <!-- flowers cluster (acomodado dentro del ramo) -->
+<g transform="translate(40,80)">
+  <!-- Flor central -->
+  <g transform="translate(160,100) scale(1.05)" class="flower">
+    <g class="petal delay">
+      <ellipse cx="-6" cy="-6" rx="18" ry="28" transform="rotate(-20)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+      <ellipse cx="12" cy="-8" rx="18" ry="28" transform="rotate(18)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+      <ellipse cx="18" cy="14" rx="16" ry="26" transform="rotate(48)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+      <ellipse cx="-18" cy="14" rx="16" ry="26" transform="rotate(-48)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+    </g>
+    <circle class="center" cx="6" cy="2" r="7" fill="#be7d08" stroke="#8a5b00" stroke-width="1"/>
+  </g>
+
+  <!-- Flor izquierda -->
+  <g transform="translate(77,100) scale(0.95)" class="flower">
+    <g class="petal">
+      <ellipse cx="-6" cy="-6" rx="18" ry="28" transform="rotate(-12)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+      <ellipse cx="12" cy="-10" rx="18" ry="28" transform="rotate(12)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+      <ellipse cx="18" cy="12" rx="16" ry="26" transform="rotate(42)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+      <ellipse cx="-18" cy="12" rx="16" ry="26" transform="rotate(-42)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+    </g>
+    <circle class="center" cx="6" cy="2" r="7" fill="#be7d08" stroke="#8a5b00" stroke-width="1"/>
+  </g>
+
+  <!-- Flor derecha -->
+  <g transform="translate(120,100) scale(1)" class="flower">
+    <g class="petal delay">
+      <ellipse cx="-6" cy="-6" rx="18" ry="28" transform="rotate(-28)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+      <ellipse cx="12" cy="-8" rx="18" ry="28" transform="rotate(26)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+      <ellipse cx="18" cy="14" rx="16" ry="26" transform="rotate(56)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+      <ellipse cx="-18" cy="14" rx="16" ry="26" transform="rotate(-56)" fill="url(#g1)" stroke="#e6b83a" stroke-width="1"/>
+    </g>
+    <circle class="center" cx="6" cy="2" r="7" fill="#be7d08" stroke="#8a5b00" stroke-width="1"/>
+  </g>
+
+  <!-- Flor pequeña relleno -->
+  <g transform="translate(110,40) scale(0.6)">
+    <g class="petal">
+      <ellipse cx="-6" cy="-6" rx="12" ry="18" transform="rotate(-10)" fill="url(#g1)" stroke="#e6b83a" stroke-width="0.8"/>
+      <ellipse cx="8" cy="-6" rx="12" ry="18" transform="rotate(18)" fill="url(#g1)" stroke="#e6b83a" stroke-width="0.8"/>
+    </g>
+    <circle class="center" cx="2" cy="1" r="4" fill="#be7d08" stroke="#8a5b00" stroke-width="0.6"/>
+  </g>
+</g>
+
+
+            <!-- small filler flowers -->
+            <g transform="translate(90,90) scale(0.6)">
+              <g class="petal">
+                <ellipse cx="-6" cy="-6" rx="12" ry="18" transform="rotate(-10)" fill="url(#g1)" stroke="#e6b83a" stroke-width="0.8"/>
+                <ellipse cx="8" cy="-6" rx="12" ry="18" transform="rotate(18)" fill="url(#g1)" stroke="#e6b83a" stroke-width="0.8"/>
+              </g>
+              <circle class="center" cx="2" cy="1" r="4" fill="#be7d08" stroke="#8a5b00" stroke-width="0.6"/>
+            </g>
+
+          </g>
+
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Descargar el archivo HTML
+      document.getElementById("download").addEventListener("click", function () {
+        const content = document.documentElement.outerHTML;
+        const blob = new Blob([content], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "ramo_para_domenica.html";
+        a.click();
+
+        URL.revokeObjectURL(url);
+      });
+
+      // Mostrar/Ocultar mensaje sorpresa
+      document.getElementById("surprise").addEventListener("click", function () {
+        const text = document.getElementById("surpriseText");
+        text.classList.toggle("hidden");
+        if (text.classList.contains("hidden")) {
+          this.textContent = "Mostrar mensaje sorpresa";
+        } else {
+          this.textContent = "Ocultar mensaje sorpresa";
+        }
+      });
+
+      const backgroundMusic = document.getElementById("backgroundMusic");
+      const audioControl = document.getElementById("audioControl");
+
+      // Try to autoplay
+      backgroundMusic.play().then(() => {
+        audioControl.classList.add("playing");
+      }).catch(error => {
+        console.log("Autoplay prevented:", error);
+        audioControl.classList.add("paused");
+      });
+
+      audioControl.addEventListener("click", () => {
+        if (backgroundMusic.paused) {
+          backgroundMusic.play();
+          audioControl.classList.remove("paused");
+          audioControl.classList.add("playing");
+        } else {
+          backgroundMusic.pause();
+          audioControl.classList.remove("playing");
+          audioControl.classList.add("paused");
+        }
+      });
+    });
+  </script>
+</body>
+</html>
